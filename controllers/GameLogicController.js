@@ -1,31 +1,14 @@
-const sendJsonResponse = function(res, status, content){
+const sendJsonResponse = (res, status, content) => {
 		res.status(status).json(content);
 	}
 
 let gameRooms = {};
 
-module.exports = {
+module.exports =  {
 
-    // createGameRoom: function(socket){
-    //     let host = {
-    //         id: socket.id,
-    //         name: socket.name
-    //     }
 
-    //     let hostCopy = Object.assign({}, host)
-
-    //     let gameRoomId = Math.floor( 1000 + Math.random() * 9000 );
-    //     //have host join room
-    //     socket.join(gameRoomId);
-    //     //return room obj
-    //     return {
-    //         id: gameRoomId,
-    //         host: host,
-    //         players: [ hostCopy ]
-    //     };
-    // },
     //data includes room id, host, and array of players
-    createRoom: function(hostSocket){
+    createRoom(hostSocket) {
         //TODO add socket.host = true so on host diconnect you can alert an action telling all players that the host is gone?
                 
         //create a room object with gameroomid, host, players 
@@ -40,7 +23,7 @@ module.exports = {
         //create room obj
         let room =  {
             id: gameRoomId,
-            host: host,
+            host,
             players: [ host ],
             round: null,
             playersAlive: [],
@@ -55,7 +38,7 @@ module.exports = {
         return Object.assign({}, gameRooms[room.id])
     },
     //check if room exists before trying to join
-    doesRoomExistAndWantPlayers: function(roomID){
+    doesRoomExistAndWantPlayers(roomID) {
         //return true or false depending on whether room exists and isnt playing
         console.log(gameRooms[roomID])
      
@@ -63,7 +46,7 @@ module.exports = {
   
     },
     //add a new player (1st arg) to the roomID(2nd arg)
-    addJoiningPlayer: function(joinerSocket, roomID){
+    addJoiningPlayer(joinerSocket, roomID) {
     
 
         let currentGameRoom = gameRooms[roomID];
@@ -76,7 +59,7 @@ module.exports = {
         console.log('ERROR: Room Doesnt exist')
     
     },
-    startGame: function(roomObj){
+    startGame(roomObj) {
         console.log('STARTING THE GAME IN THE CONTROLLER. HERS THE DATA THE CONTROLLER RECEIVED', roomObj);
         //init each player in game with bullets, shielded, current move 
         let playersAlive = roomObj.players.map((player, index)=>{
@@ -95,7 +78,7 @@ module.exports = {
             players: roomObj.players,
             round: 1,
             movesMadeThisRound: 0,
-            playersAlive: playersAlive,
+            playersAlive,
             playersDead: [],
             playing: true,
             startNextRoundVotes: 0,
@@ -108,7 +91,7 @@ module.exports = {
         return Object.assign({}, gameRooms[inittedRoom.id])
     },
 
-    updatePlayerMove: function(playerObj, roomObj){
+    updatePlayerMove(playerObj, roomObj) {
         let currentGameRoom = gameRooms[roomObj.id];
         let curPlayerIndex = this.findPlayerIndexByObjKeyInArray(currentGameRoom.playersAlive, 'id', playerObj.id);
         //set currentMoveReceived to true
@@ -152,7 +135,7 @@ module.exports = {
        
     },
 
-    findPlayerIndexByObjKeyInArray: function(array, objKey, objVal){
+    findPlayerIndexByObjKeyInArray(array, objKey, objVal) {
         console.log('heres the array', array)
         console.log('hers the thing youre looking for ', objVal)
         let foundPlayerIndex = array.findIndex((currentEle)=>{
@@ -165,22 +148,23 @@ module.exports = {
         
     },
 
-    calculateRoundResults: function(roomObj){
+    calculateRoundResults(roomObj) {
         let roomWithUpdatedBlocks = this.updateBlocks(roomObj);
         let roomWithUpdatedReloads = this.updateReloads(roomWithUpdatedBlocks);
-        let roomWithUpdatedShoots = this.updateShoots(roomWithUpdatedReloads);
+        let roomWithUpdatedNothing = this.updateNothing(roomWithUpdatedReloads);
+        let roomWithUpdatedShoots = this.updateShoots(roomWithUpdatedNothing);
         let roomWithUpdatedPlaying = this.isRoomStillPlaying(roomWithUpdatedShoots);
         
         
         return roomWithUpdatedPlaying;
     },
 
-    updateBlocks: function(roomObj){
+    updateBlocks(roomObj) {
         let blockResults = [];
-        roomObj.playersAlive.forEach(function(curVal, index, array){
+        roomObj.playersAlive.forEach((curVal, index, array) => {
             if(curVal.currentMove.move === 'block'){
                 curVal.blocked = true;
-                blockResults.push(curVal.name + ' Blocked! They are invulnerable during this Round.')
+                blockResults.push(`${curVal.name} Blocked! They are invulnerable during this Round.`)
             } 
         });
         //add results of this block update to roomObj.results
@@ -189,12 +173,12 @@ module.exports = {
         return roomObj;
     },
 
-    updateReloads: function(roomObj){
+    updateReloads(roomObj) {
         let reloadResults = [];
-        roomObj.playersAlive.forEach(function(curVal, index, array){
+        roomObj.playersAlive.forEach((curVal, index, array) => {
             if(curVal.currentMove.move === 'reload'){
                 curVal.bullets++;
-                reloadResults.push(curVal.name + ' Reloaded! They now have ' + curVal.bullets + ' total Bullets.')
+                reloadResults.push(`${curVal.name} Reloaded! They now have ${curVal.bullets} total Bullets.`)
             }
         });
         //add results of this block update to roomObj.results
@@ -203,17 +187,31 @@ module.exports = {
         return roomObj;
     },
 
-    updateShoots: function(roomObj){
+    updateNothing(roomObj) {
+        let nothingResults = [];
+        roomObj.playersAlive.forEach((curVal, index, array) => {
+            if(curVal.currentMove.move === 'nothing'){
+               
+                nothingResults.push(`${curVal.name} stood around doing nothing!`)
+            }
+        });
+        //add results of this block update to roomObj.results
+        roomObj.results = roomObj.results.concat(nothingResults)
+        console.log('Heres the updateNothign room Obj', roomObj);
+        return roomObj;
+    },
+
+    updateShoots(roomObj) {
         let outerThis = this;
         let shootResults = [];
         let playersToKillOffDelayed = [];
-        roomObj.playersAlive.forEach(function(curVal, index, array){
+        roomObj.playersAlive.forEach((curVal, index, array) => {
             if(curVal.currentMove.move === 'shoot'){
                 //find index of the target of the shot
                 let targetIndex = outerThis.findPlayerIndexByObjKeyInArray(roomObj.playersAlive, 'id' , curVal.currentMove.target);
                 if( targetIndex < 0 ){
                     targetIndex = outerThis.findPlayerIndexByObjKeyInArray(roomObj.playersDead, 'id' , curVal.currentMove.target);
-                    shootResults.push(curVal.name + ' tried to shoot ' + roomObj.playersDead[targetIndex].name + ', but they\'re already dead!' );
+                    shootResults.push(`${curVal.name} tried to shoot ${roomObj.playersDead[targetIndex].name}, but they're already dead!` );
                 }
                 else{
 
@@ -223,7 +221,7 @@ module.exports = {
 
                         //if taget didnt block theyre dead
                         if(!roomObj.playersAlive[targetIndex].blocked){
-                            shootResults.push(curVal.name + ' shot ' + roomObj.playersAlive[targetIndex].name + ' dead!' );
+                            shootResults.push(`${curVal.name} shot ${roomObj.playersAlive[targetIndex].name} dead!` );
                             //if target curretmove is shoot hold off on splicing them 
                             if(roomObj.playersAlive[targetIndex].currentMove.move === 'shoot' && roomObj.playersAlive[targetIndex].bullets > 0){
                                 console.log('pushing to delaying kill', targetIndex)
@@ -240,12 +238,12 @@ module.exports = {
                         }//end if !blocked
                         //if they did block
                         else{
-                            shootResults.push(curVal.name + ' tried to Shoot ' + roomObj.playersAlive[targetIndex].name + ', but ' + roomObj.playersAlive[targetIndex].name + ' Blocked the Shot!');
+                            shootResults.push(`${curVal.name} tried to Shoot ${roomObj.playersAlive[targetIndex].name}, but ${roomObj.playersAlive[targetIndex].name} Blocked the Shot!`);
                         }
                     }
                     //if not enough bullets
                     else{
-                        shootResults.push(curVal.name + ' tried to shoot ' + roomObj.playersAlive[targetIndex].name + ', but they fired a blank!');
+                        shootResults.push(`${curVal.name} tried to shoot ${roomObj.playersAlive[targetIndex].name}, but they fired a blank!`);
                     }
                 }
                 
@@ -253,7 +251,7 @@ module.exports = {
             
         });//end foreach
         //kill off all delayed dead player allowing them to shoot before they die
-        for(var i = 0; i < playersToKillOffDelayed.length; i++){
+        for(let i = 0; i < playersToKillOffDelayed.length; i++){
             let delayedDeadPlayerIndex = this.findPlayerIndexByObjKeyInArray(roomObj.playersAlive, 'id', playersToKillOffDelayed[i])
             let delayedDeadPlayer = roomObj.playersAlive.splice(delayedDeadPlayerIndex, 1)
             console.log('heres roomObj after killing delayed player splice', roomObj.playersAlive)
@@ -266,13 +264,13 @@ module.exports = {
         return roomObj
     },//end updateShoots
 
-    isRoomStillPlaying: function(roomObj){
+    isRoomStillPlaying(roomObj) {
         //if only 1 player remaining set playing to false and push game over to results
         if(roomObj.playersAlive.length <= 1){
             console.log('only 1 player left, game is over')
             roomObj.playing = false; 
             if(roomObj.playersAlive[0] && roomObj.playersAlive[0].name){
-                roomObj.results.push(roomObj.playersAlive[0].name + ' is the final Player left standing. ' + roomObj.playersAlive[0].name + ' wins the game!')
+                roomObj.results.push(`${roomObj.playersAlive[0].name} is the final Player left standing. ${roomObj.playersAlive[0].name} wins the game!`)
             }
             else{
 
@@ -288,7 +286,7 @@ module.exports = {
         }
     },
 
-    prepareNextRound: function(playerObj, roomObj){
+    prepareNextRound(playerObj, roomObj) {
         console.log('prepareNExtRound playerObj', playerObj)
         console.log('prepareNextRound roomObj', roomObj)
         let currentGameRoom = gameRooms[roomObj.id];
@@ -367,12 +365,12 @@ module.exports = {
 
     },
 
-    resetRoomForNextRound: function(roomObj){
+    resetRoomForNextRound(roomObj) {
         let currentGameRoom = gameRooms[roomObj.id];
 
         let resetRoomObj = Object.assign({}, currentGameRoom, {
             movesMadeThisRound: 0,
-            round: currentGameRoom.round++,
+            round: currentGameRoom.round+=1,
             results: [],
             startNextRoundVotes: 0
         })
