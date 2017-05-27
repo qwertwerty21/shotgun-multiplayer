@@ -92,48 +92,52 @@ module.exports =  {
     },
 
     updatePlayerMove(playerObj, roomObj) {
+        console.log('UPDATING PLAYER MOVE', gameRooms[roomObj.id])
         let currentGameRoom = gameRooms[roomObj.id];
-        let curPlayerIndex = this.findPlayerIndexByObjKeyInArray(currentGameRoom.playersAlive, 'id', playerObj.id);
-        //set currentMoveReceived to true
-      
-        let updatedPlayerObj = Object.assign({}, playerObj, {
-            currentMoveReceived: true
-        });
-        console.log('THIS IS THE CURRENTGAMEROOM Before updateing the player move', currentGameRoom);
-        console.log('this is the player obj with crrent move received set to true', updatedPlayerObj)
-        //overwrite playersAlive in gameRooms with data from action.payload.currentPlayer
-        //make a copy of gameRooms and assign a new curPlayer
-        if(curPlayerIndex >= 0){
+        if(currentGameRoom){
 
-            currentGameRoom.playersAlive[curPlayerIndex] = updatedPlayerObj;
-        }
+            let curPlayerIndex = this.findPlayerIndexByObjKeyInArray(currentGameRoom.playersAlive, 'id', playerObj.id);
+            //set currentMoveReceived to true
         
-        //incrememnt moves made this round
-        currentGameRoom.movesMadeThisRound++;
-        console.log('heres the updated gameRoom', currentGameRoom)
-
-        if( currentGameRoom.movesMadeThisRound >= currentGameRoom.playersAlive.length ){
-
-            console.log('All moves have been made. Calculating results...')
-            console.log('FINISHED GAME ROOM',currentGameRoom)
-            console.log('CURERNT PLAYER', updatedPlayerObj)
-
-            let roomCopy = Object.assign({}, currentGameRoom);
-            return this.calculateRoundResults(roomCopy);
-            //gameLogicController find blocks, make them invulnerable, find reloads, add Bullets, find shots, subtract a bullet, 
-
-            //if bullet less than 0, add you have no bullets to the array of hwat hpapned in round, 
-            //find target check if they blocked
-            //if the target didnt block remove them from players alive and into playersDead
-            //create an array of what happend in the round and send to app.io.in
-            //app.io.in show Results of Round
-        }//end if calcuarRoundreuslts
-        else{
-            return Object.assign({}, {
-                room: currentGameRoom,
-                player: updatedPlayerObj
+            let updatedPlayerObj = Object.assign({}, playerObj, {
+                currentMoveReceived: true
             });
-        }
+            console.log('THIS IS THE CURRENTGAMEROOM Before updateing the player move', currentGameRoom);
+            console.log('this is the player obj with crrent move received set to true', updatedPlayerObj)
+            //overwrite playersAlive in gameRooms with data from action.payload.currentPlayer
+            //make a copy of gameRooms and assign a new curPlayer
+            if(curPlayerIndex >= 0){
+
+                currentGameRoom.playersAlive[curPlayerIndex] = updatedPlayerObj;
+            }
+            
+            //incrememnt moves made this round
+            currentGameRoom.movesMadeThisRound++;
+            console.log('heres the updated gameRoom', currentGameRoom)
+
+            if( currentGameRoom.movesMadeThisRound >= currentGameRoom.playersAlive.length ){
+
+                console.log('All moves have been made. Calculating results...')
+                console.log('FINISHED GAME ROOM',currentGameRoom)
+                console.log('CURERNT PLAYER', updatedPlayerObj)
+
+                let roomCopy = Object.assign({}, currentGameRoom);
+                return this.calculateRoundResults(roomCopy);
+                //gameLogicController find blocks, make them invulnerable, find reloads, add Bullets, find shots, subtract a bullet, 
+
+                //if bullet less than 0, add you have no bullets to the array of hwat hpapned in round, 
+                //find target check if they blocked
+                //if the target didnt block remove them from players alive and into playersDead
+                //create an array of what happend in the round and send to app.io.in
+                //app.io.in show Results of Round
+            }//end if calcuarRoundreuslts
+            else{
+                return Object.assign({}, {
+                    room: currentGameRoom,
+                    player: updatedPlayerObj
+                });
+            }
+        }//end if currentGameroom
 
        
     },
