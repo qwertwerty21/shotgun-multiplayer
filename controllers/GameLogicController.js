@@ -169,7 +169,7 @@ module.exports =  {
     updateBlocks(roomObj) {
         let blockResults = [];
         roomObj.playersAlive.forEach((curVal, index, array) => {
-            if(curVal.currentMove.move === 'block'){
+            if(curVal.currentMove && curVal.currentMove.move === 'block'){
                 curVal.blocked = true;
                 blockResults.push(`${curVal.name} Blocked! They are invulnerable during this Round.`)
             } 
@@ -183,7 +183,7 @@ module.exports =  {
     updateReloads(roomObj) {
         let reloadResults = [];
         roomObj.playersAlive.forEach((curVal, index, array) => {
-            if(curVal.currentMove.move === 'reload'){
+            if(curVal.currentMove && curVal.currentMove.move === 'reload'){
                 curVal.bullets++;
                 reloadResults.push(`${curVal.name} Reloaded! They now have ${curVal.bullets} total Bullets.`)
             }
@@ -197,7 +197,7 @@ module.exports =  {
     updateNothing(roomObj) {
         let nothingResults = [];
         roomObj.playersAlive.forEach((curVal, index, array) => {
-            if(curVal.currentMove.move === 'nothing'){
+            if(curVal.currentMove && curVal.currentMove.move === 'nothing'){
                
                 nothingResults.push(`${curVal.name} stood around doing nothing!`)
             }
@@ -213,7 +213,7 @@ module.exports =  {
         let shootResults = [];
         let playersToKillOffDelayed = [];
         roomObj.playersAlive.forEach((curVal, index, array) => {
-            if(curVal.currentMove.move === 'shoot'){
+            if(curVal.currentMove && curVal.currentMove.move === 'shoot'){
                 //find index of the target of the shot
                 let targetIndex = outerThis.findPlayerIndexByObjKeyInArray(roomObj.playersAlive, 'id' , curVal.currentMove.target);
                 if( targetIndex < 0 ){
