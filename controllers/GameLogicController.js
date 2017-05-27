@@ -103,7 +103,10 @@ module.exports =  {
         console.log('this is the player obj with crrent move received set to true', updatedPlayerObj)
         //overwrite playersAlive in gameRooms with data from action.payload.currentPlayer
         //make a copy of gameRooms and assign a new curPlayer
-        currentGameRoom.playersAlive[curPlayerIndex] = updatedPlayerObj;
+        if(curPlayerIndex >= 0){
+
+            currentGameRoom.playersAlive[curPlayerIndex] = updatedPlayerObj;
+        }
         
         //incrememnt moves made this round
         currentGameRoom.movesMadeThisRound++;
