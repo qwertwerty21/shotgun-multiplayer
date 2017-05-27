@@ -84,7 +84,7 @@ app.io.on('connection', socket => {
                 console.log('heres updatedtoomwithplayermove',updatedRoomWithPlayerMove);
                 
                 //if all players have submitted their moves the game logic will instead return the update room with a list of reuslts to be displayed on the screen between rounds to explain what happended in the round
-                if(updatedRoomWithPlayerMove.results && updatedRoomWithPlayerMove.results.length > 0){
+                if(updatedRoomWithPlayerMove && updatedRoomWithPlayerMove.results && updatedRoomWithPlayerMove.results.length > 0){
                 
                     console.log('ROUND S ALL DONE HERE IS THE FINAL REUSLTS FDKJDSLFJLSDFJKLDSF', updatedRoomWithPlayerMove)
 
