@@ -230,7 +230,7 @@ module.exports =  {
                         if(!roomObj.playersAlive[targetIndex].blocked){
                             shootResults.push(`${curVal.name} shot ${roomObj.playersAlive[targetIndex].name} dead!` );
                             //if target curretmove is shoot hold off on splicing them 
-                            if(roomObj.playersAlive[targetIndex].currentMove.move === 'shoot' && roomObj.playersAlive[targetIndex].bullets > 0){
+                            if(roomObj.playersAlive[targetIndex].currentMove && roomObj.playersAlive[targetIndex].currentMove.move === 'shoot' && roomObj.playersAlive[targetIndex].bullets > 0){
                                 console.log('pushing to delaying kill', targetIndex)
                                 playersToKillOffDelayed.push(roomObj.playersAlive[targetIndex].id)
                             }//end if
