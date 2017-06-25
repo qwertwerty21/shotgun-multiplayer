@@ -3,7 +3,7 @@
   "name": "Shotgun-Multiplayer",
   "icons": [
     {
-      "src":"192icon.png",
+      "src":"./192icon.png",
       "sizes": "192x192",
       "type": "image/png"
     }
