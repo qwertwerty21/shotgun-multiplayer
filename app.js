@@ -1,6 +1,4 @@
-//require new relic for monitoring and pinging to prevent downtime must be first line
-//require('newrelic');
-
+const sslRedirect = require('heroku-ssl-redirect');
 const express = require('express');
 const path = require('path');
 
@@ -12,18 +10,13 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
-//const mongoURL = process.env.MONGO_URL;
-
-//require('./config/cloudinary');
-
 //require routes
 const routes = require('./routes/');
-//const forms = require('./routes/forms');
-// const recipepost = require('./routes/recipepost');
-// const user = require('./routes/user');
 
 //init express instance
 let app = express();
+//redirect http to https
+app.use(sslRedirect());
 
 //call socketio to app
 app.io = require('socket.io')();
@@ -39,21 +32,6 @@ app.set('view engine', 'jade');
 //connect flash
 app.use(flash());
 
-// //connect to mongodb
-// mongoose.connect(mongoURL, function(err) {
-//     if (err) {
-//         console.log(err);
-//     } else {
-//         console.log('Connected to mongodb!');
-//     }
-// });
-
-// //config passport
-// require('./config/passport.js');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-
 //cors middleware
 app.use(cors());
 //logger middleware
@@ -67,19 +45,9 @@ app.use(
     parameterLimit: 50000
   })
 );
-//express-session middleware
-// app.use(session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: true,
-//     saveUninitialized: true
-// }));
 
 //cookieparser middleware
 app.use(cookieParser());
-
-// //init passport
-// app.use(passport.initialize());
-// app.use(passport.session());
 
 //enable browser cache headers
 let cacheTime = 86400000 * 7; //7 days
@@ -87,11 +55,6 @@ let cacheTime = 86400000 * 7; //7 days
 //set static folder  serve static assets normally from this folder
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: cacheTime })); //was 'public'
 
-// //global vars
-// app.use(function(req, res, next) {
-//     res.locals.user = req.user || null;
-//     next();
-// });
 app.use(
   require('node-sass-middleware')({
     src: path.join(__dirname, 'public'),
@@ -124,10 +87,6 @@ app.use(function(req, res, next) {
 app.get('/*', function(req, res) {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
-
-// app.io.on('connection', function(socket){
-//     console.log('A socket Connected!', socket)
-// });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
